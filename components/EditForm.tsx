@@ -1,6 +1,19 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { editProductAction } from "@/lib/actions";
+import { UploadDropzone } from "@/lib/uploadthing";
+import { productSchema } from "@/lib/zodSchema";
+import { useForm } from "@conform-to/react";
+import { parseWithZod } from "@conform-to/zod";
+import { type $Enums } from "@prisma/client";
+import { ChevronLeft, XIcon } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
+import { useFormState } from "react-dom";
+import { toast } from "sonner";
+import SubmitButtons from "./SubmitButtons";
+import { Button } from "./ui/button";
 import {
   Card,
   CardContent,
@@ -8,34 +21,35 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "./ui/card";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { createProductAction } from "@/lib/actions";
-import { UploadDropzone } from "@/lib/uploadthing";
-import { ChevronLeft, XIcon } from "lucide-react";
-import Link from "next/link";
-import { useFormState } from "react-dom";
-import { toast } from "sonner";
-import { useForm } from "@conform-to/react";
-import { parseWithZod } from "@conform-to/zod";
-import { productSchema } from "@/lib/zodSchema";
-import { useState } from "react";
-import Image from "next/image";
-import SubmitButtons from "@/components/SubmitButtons";
+} from "./ui/select";
+import { Switch } from "./ui/switch";
+import { Textarea } from "./ui/textarea";
 
-const CreateProductPage = () => {
-  const [images, setImages] = useState<string[]>([]);
-  const [lastResult, action] = useFormState(createProductAction, undefined);
+interface Props {
+  product: {
+    id: string;
+    name: string;
+    description: string;
+    status: $Enums.ProductStatus;
+    price: number;
+    images: string[];
+    category: $Enums.Category;
+    isFeatured: boolean;
+  };
+}
+
+const EditForm = ({ product }: Props) => {
+  const [images, setImages] = useState<string[]>(product.images);
+  const [lastResult, action] = useFormState(editProductAction, undefined);
   const [form, fields] = useForm({
     lastResult,
     onValidate({ formData }) {
@@ -51,18 +65,19 @@ const CreateProductPage = () => {
 
   return (
     <form id={form.id} onSubmit={form.onSubmit} action={action}>
+      <input type="hidden" value={product.id} name="productId" />
       <div className="flex items-center gap-4">
         <Button variant={"outline"} size={"icon"} asChild>
           <Link href={"/dashboard/products"}>
             <ChevronLeft className="size-6" />
           </Link>
         </Button>
-        <h2 className="text-xl font-semibold tracking-tight">New Product</h2>
+        <h2 className="text-xl font-semibold tracking-tight">Edit Product</h2>
       </div>
       <Card className="mt-6">
         <CardHeader>
           <CardTitle>Product Details</CardTitle>
-          <CardDescription>Start creating your product here!</CardDescription>
+          <CardDescription>Start editing your product here!</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-8">
@@ -71,7 +86,7 @@ const CreateProductPage = () => {
               <Input
                 key={fields.name.key}
                 name={fields.name.name}
-                defaultValue={fields.name.initialValue}
+                defaultValue={product.name}
                 type="text"
                 className="w-full"
                 placeholder="product name"
@@ -83,7 +98,7 @@ const CreateProductPage = () => {
               <Textarea
                 name={fields.description.name}
                 key={fields.description.key}
-                defaultValue={fields.description.initialValue}
+                defaultValue={product.description}
                 placeholder="product description"
               />
               <p className="text-red-500">{fields.description.errors}</p>
@@ -93,7 +108,7 @@ const CreateProductPage = () => {
               <Input
                 name={fields.price.name}
                 key={fields.price.key}
-                defaultValue={fields.price.initialValue}
+                defaultValue={product.price}
                 type="number"
                 placeholder="$100.99"
               />
@@ -104,7 +119,7 @@ const CreateProductPage = () => {
               <Switch
                 key={fields.isFeatured.key}
                 name={fields.isFeatured.name}
-                defaultValue={fields.isFeatured.initialValue}
+                checked={product.isFeatured}
               />
               <p className="text-red-500">{fields.isFeatured.errors}</p>
             </div>
@@ -113,7 +128,7 @@ const CreateProductPage = () => {
               <Select
                 key={fields.status.key}
                 name={fields.status.name}
-                defaultValue={fields.status.initialValue}
+                defaultValue={product.status}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="status" />
@@ -132,7 +147,7 @@ const CreateProductPage = () => {
               <Select
                 key={fields.category.key}
                 name={fields.category.name}
-                defaultValue={fields.category.initialValue}
+                defaultValue={product.category}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="catgory" />
@@ -195,11 +210,11 @@ const CreateProductPage = () => {
           </div>
         </CardContent>
         <CardFooter>
-          <SubmitButtons text="Create product" />
+          <SubmitButtons text="Edit product" />
         </CardFooter>
       </Card>
     </form>
   );
 };
 
-export default CreateProductPage;
+export default EditForm;

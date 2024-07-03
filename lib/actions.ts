@@ -43,3 +43,43 @@ export const createProductAction = async (
 
   redirect("/dashboard/products");
 };
+
+export const editProductAction = async (prev: unknown, formData: FormData) => {
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
+
+  if (!user) {
+    return redirect("/");
+  }
+
+  const submission = parseWithZod(formData, {
+    schema: productSchema,
+  });
+
+  if (submission.status !== "success") {
+    return submission.reply();
+  }
+
+  const productId = formData.get("productId") as string;
+  const flattenUrl = submission.value.images.flatMap(urlString =>
+    urlString.split(",").map(url => url.trim())
+  );
+
+  const { category, name, description, price, status, isFeatured, images } =
+    submission.value;
+
+  await prisma.product.update({
+    where: { id: productId },
+    data: {
+      name,
+      description,
+      price,
+      isFeatured,
+      images: flattenUrl,
+      status,
+      category,
+    },
+  });
+
+  redirect("/dashboard/products");
+};
