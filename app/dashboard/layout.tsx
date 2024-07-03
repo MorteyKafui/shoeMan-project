@@ -67,7 +67,7 @@ const DashboardLayout = async ({ children }: PropsWithChildren) => {
         </DropdownMenu>
       </header>
 
-      {children}
+      <main className="my-8">{children}</main>
     </div>
   );
 };
