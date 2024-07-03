@@ -119,7 +119,7 @@ const EditForm = ({ product }: Props) => {
               <Switch
                 key={fields.isFeatured.key}
                 name={fields.isFeatured.name}
-                checked={product.isFeatured}
+                defaultChecked={product.isFeatured}
               />
               <p className="text-red-500">{fields.isFeatured.errors}</p>
             </div>

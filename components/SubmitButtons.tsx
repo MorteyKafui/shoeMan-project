@@ -4,7 +4,20 @@ import { useFormStatus } from "react-dom";
 import { Button } from "./ui/button";
 import { Loader2 } from "lucide-react";
 
-const SubmitButtons = ({ text }: { text: string }) => {
+interface Props {
+  text: string;
+  variant?:
+    | "default"
+    | "destructive"
+    | "ghost"
+    | "link"
+    | "outline"
+    | "secondary"
+    | null
+    | undefined;
+}
+
+const SubmitButtons = ({ text, variant }: Props) => {
   const { pending } = useFormStatus();
 
   return (
@@ -15,7 +28,9 @@ const SubmitButtons = ({ text }: { text: string }) => {
           <span>Please wait...</span>
         </Button>
       ) : (
-        <Button type="submit">{text}</Button>
+        <Button variant={variant} type="submit">
+          {text}
+        </Button>
       )}
     </>
   );
