@@ -1,4 +1,5 @@
 import DashboardNavigation from "@/components/DashboardNavigation";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -52,7 +53,13 @@ const DashboardLayout = async ({ children }: PropsWithChildren) => {
               size={"icon"}
               className="rounded-full"
             >
-              <CircleUser className="size-5" />
+              {user.picture ? (
+                <Avatar>
+                  <AvatarImage src={user.picture} />
+                </Avatar>
+              ) : (
+                <CircleUser className="size-5" />
+              )}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
